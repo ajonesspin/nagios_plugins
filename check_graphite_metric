@@ -21,7 +21,7 @@
 
 # set this to your graphite settings. remove -u parameter for curl if you don't have http authentication
 CURL_OPTIONS="-s -u YOUR_HTTP_USER:YOUR_HTTP_PASSWORD"
-GRAPHITE_RENDER_URL="https://srv-monitor.sociomantic.com:8080/render/"
+GRAPHITE_RENDER_URL="https://YOUR_NAGIOS_BASE_URL/render/"
 
 # Declare some defaults
 EXIT_NAGIOS_STATUS=-1
@@ -145,6 +145,11 @@ esac
 
 # Run query against graphite and store last non-none values on the array
 for GRAPHITE_OUT in $(curl ${CURL_OPTIONS} ${GRAPHITE_QUERY_BASE}${METRIC_STRING} | sed 's/ //g') ; do
+        if [ "${GRAPHITE_METRIC:0:1}" = "<" ] ; then
+                GLOBAL_STATE=2
+                CHECK_OUTPUT="Graphite returned an error, check your metric: ${METRIC_STRING}"
+                exit_cri
+        fi
 	GRAPHITE_METRIC=$(cut -f1 -d\| <<< $GRAPHITE_OUT | sed  's/,[0-9]*,[0-9]*,[0-9]*$//')
 	RES_METRICS+=("$GRAPHITE_METRIC")
 	for GRAPHITE_VALUE in $(cut -f2 -d\| <<< $GRAPHITE_OUT | sed 's/,/ /g') ; do
