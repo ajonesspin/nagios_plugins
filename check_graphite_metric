@@ -162,7 +162,7 @@ if [ ${#RES_VALUES[@]} -eq 0 ] ; then
 	CHECK_OUTPUT="Graphite query ${METRIC_STRING} returned nothing."
 else
 	for METRIC in ${RES_METRICS[*]} ; do
-		CHECK_OUTPUT="${CHECK_OUTPUT}${METRIC}=${RES_VALUES[$METRIC]}; "
+		CHECK_OUTPUT="${CHECK_OUTPUT}${METRIC}=${RES_VALUES[$METRIC]}; perfdata=${RES_VALUES[$METRIC]}"
 		METRIC_STATUS=0
 		if [ $HAS_LO_PARAMS -eq 2 ] ; then
 			awk "BEGIN {exit !(${RES_VALUES["$METRIC"]} < $WARN_LVL_LOW)}" && METRIC_STATUS=1
